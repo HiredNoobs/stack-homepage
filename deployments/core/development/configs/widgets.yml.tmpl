@@ -1,8 +1,11 @@
-- system:
-    type: prometheus
-    url: https://victoriametrics.$DOMAIN
-    node: atlas.$DOMAIN:9100
-    cpu: true
-    memory: true
-    disk: /
-    uptime: true
+- datetime:
+    text_size: xl
+    format:
+      timeStyle: short
+      dateStyle: long
+    locale: en-GB
+    timezone: Europe/London
+
+- search:
+    provider: duckduckgo
+    focus: true
