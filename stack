@@ -16,8 +16,8 @@ function build_configs {
 # -----------------------------------------------------
 
 function stack_check_env {
-  if [ ! -f "$CONFIGS" ] || [ ! -d "$SECRETS" ]; then
-    echo "Secrets directory is missing from '$ENVIRONMENT_BASE'."
+  if [ ! -d "$CONFIGS" ] || [ ! -d "$SECRETS" ]; then
+    echo "Configs or secrets directory is missing from '$ENVIRONMENT_BASE'."
     exit 1
   fi
 }
