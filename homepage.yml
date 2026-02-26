@@ -16,6 +16,8 @@ services:
         target: /app/config/services.yaml
       - source: bookmarks_yml
         target: /app/config/bookmarks.yaml
+      - source: custom_css
+        target: /app/config/custom.css
     environment:
       HOMEPAGE_ALLOWED_HOSTS: homepage.$DOMAIN
     deploy:
@@ -35,3 +37,5 @@ configs:
     file: ${CONFIGS}/services.yml
   bookmarks_yml:
     file: ${CONFIGS}/bookmarks.yml
+  custom_css:
+    file: ${CONFIGS}/custom.css
