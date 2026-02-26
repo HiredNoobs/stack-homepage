@@ -16,7 +16,7 @@ services:
         target: /app/config/bookmarks.yml
     deploy:
       mode: replicated
-      replicas: $HOMELAB_REPLICAS
+      replicas: $HOMEPAGE_REPLICAS
       placement:
         max_replicas_per_node: 1
         constraints:
