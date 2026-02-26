@@ -10,10 +10,14 @@ services:
     configs:
       - source: settings_yml
         target: /app/config/settings.yml
+      - source: widgets_yml
+        target: /app/config/widgets.yml
       - source: services_yml
         target: /app/config/services.yml
       - source: bookmarks_yml
         target: /app/config/bookmarks.yml
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homepage.$DOMAIN
     deploy:
       mode: replicated
       replicas: $HOMEPAGE_REPLICAS
@@ -25,6 +29,8 @@ services:
 configs:
   settings_yml:
     file: ${CONFIGS}/settings.yml
+  widgets_yml:
+    file: ${CONFIGS}/widgets.yml
   services_yml:
     file: ${CONFIGS}/services.yml
   bookmarks_yml:
