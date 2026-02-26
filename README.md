@@ -1,2 +1,3 @@
 # stack-homepage
+
 Homepage deployment.

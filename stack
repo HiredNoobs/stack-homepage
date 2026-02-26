@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# -----------------------------------------------------
+# Helper functions
+# -----------------------------------------------------
+
+function build_configs {
+  find "$CONFIGS" -maxdepth 1 -type f -name '*.tmpl' | while IFS= read -r tmpl; do
+    local out="${tmpl%.tmpl}"
+    envsubst < "$tmpl" > "$out"
+  done
+}
+
+# -----------------------------------------------------
+# Stack functions
+# -----------------------------------------------------
+
+function stack_check_env {
+  if [ ! -f "$CONFIGS" ] || [ ! -d "$SECRETS" ]; then
+    echo "Secrets directory is missing from '$ENVIRONMENT_BASE'."
+    exit 1
+  fi
+}
+
+function stack_discover {
+  export HOMELAB_REPLICAS=$(count "$HOMELAB_REPLICAS")
+}
+
+function stack_env {
+  echo
+  echo "HOMEPAGE IMAGE = $HOMEPAGE_IMAGE"
+  echo "HOMEPAGE PORT  = $HOMEPAGE_PORT"
+  echo "HOMEPAGE NODES = ($HOMEPAGE_REPLICAS)"
+  list "$HOMEPAGE_NODES"
+  echo
+}
+
+function stack_deploy {
+  build_configs
+  docker stack deploy --detach=true -c homepage.yml "$STACK"
+}

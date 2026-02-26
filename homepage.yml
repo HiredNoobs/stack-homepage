@@ -1,0 +1,31 @@
+services:
+  homepage:
+    hostname: homepage{{.Task.Slot}}
+    image: $HOMEPAGE_IMAGE
+    ports:
+      - mode: host
+        published: $HOMEPAGE_PORT
+        target: $HOMEPAGE_PORT
+        protocol: tcp
+    configs:
+      - source: settings_yml
+        target: /app/config/settings.yml
+      - source: services_yml
+        target: /app/config/services.yml
+      - source: bookmarks_yml
+        target: /app/config/bookmarks.yml
+    deploy:
+      mode: replicated
+      replicas: $HOMELAB_REPLICAS
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.labels.${STACK}_homepage == 1
+
+configs:
+  settings_yml:
+    file: ${CONFIGS}/settings.yml
+  services_yml:
+    file: ${CONFIGS}/services.yml
+  bookmarks_yml:
+    file: ${CONFIGS}/bookmarks.yml
