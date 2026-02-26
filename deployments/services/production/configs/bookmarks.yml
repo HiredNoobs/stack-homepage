@@ -11,7 +11,7 @@
     - href: https://account.proton.me/login
       icon: proton-mail
   - Gmail:
-    - href: https://mail.google.com
+    - href: https://mail.google.com/
       icon: gmail
 
 - GW2:
@@ -29,9 +29,12 @@
       icon: https://gw2wingman.nevermindcreations.de/static/favicon.png
 
 - Socials:
+  - YouTube:
+    - href: https://youtube.com/
+      icon: youtube
   - Twitter:
     - href: https://twitter.com/
       icon: twitter
   - Reddit:
-    - href: https://www.reddit.com/
+    - href: https://reddit.com/
       icon: reddit
