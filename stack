@@ -23,7 +23,7 @@ function stack_check_env {
 }
 
 function stack_discover {
-  export HOMELAB_REPLICAS=$(count "$HOMELAB_REPLICAS")
+  export HOMEPAGE_REPLICAS=$(count "$HOMELAB_REPLICAS")
 }
 
 function stack_env {
