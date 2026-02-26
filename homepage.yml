@@ -9,13 +9,13 @@ services:
         protocol: tcp
     configs:
       - source: settings_yml
-        target: /app/config/settings.yml
+        target: /app/config/settings.yaml
       - source: widgets_yml
-        target: /app/config/widgets.yml
+        target: /app/config/widgets.yaml
       - source: services_yml
-        target: /app/config/services.yml
+        target: /app/config/services.yaml
       - source: bookmarks_yml
-        target: /app/config/bookmarks.yml
+        target: /app/config/bookmarks.yaml
     environment:
       HOMEPAGE_ALLOWED_HOSTS: homepage.$DOMAIN
     deploy:
