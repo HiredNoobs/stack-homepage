@@ -9,7 +9,7 @@
 - Email:
   - Proton:
     - href: https://account.proton.me/login
-      icon: protonmail
+      icon: proton-mail
   - Gmail:
     - href: https://mail.google.com
       icon: gmail
