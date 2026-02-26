@@ -7,14 +7,19 @@
         url: https://proxmox.$DOMAIN
         username: $PROXMOX_API_USER
         password: $PROXMOX_API_PASS
+  - Pi-hole:
+      href: https://pihole.$DOMAIN/admin
+      icon: pihole
+      widget:
+        type: pihole
+        url: https://pihole.$DOMAIN
+        version: 6
+        key: $PIHOLE_API_KEY
 
 - Networking:
   - Router:
       href: https://router.$DOMAIN
       icon: router
-  - Pi-hole:
-      href: https://pihole.$DOMAIN/admin
-      icon: pihole
   - Reverse Proxy:
       href: https://reverseproxy.$DOMAIN
       icon: nginx
