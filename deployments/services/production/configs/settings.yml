@@ -1,10 +1,6 @@
 title: "Homelab Dashboard"
 theme: dark
 color: slate
-headerStyle: clean
+headerStyle: underlined
 showStats: false
 hideVersion: true
-
-providers:
-  openweathermap: ""
-  weatherapi: ""
