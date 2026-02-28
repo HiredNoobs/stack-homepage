@@ -31,6 +31,12 @@
   - Grafana:
       href: https://grafana.$DOMAIN
       icon: grafana
+      widget:
+        type: grafana
+        version: 2
+        url: https://grafana.$DOMAIN
+        username: $GRAFANA_USER
+        password: $GRAFANA_PASS
   - VictoriaMetrics:
       href: https://victoriametrics.$DOMAIN
       icon: prometheus
