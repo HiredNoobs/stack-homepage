@@ -7,22 +7,27 @@
         url: https://proxmox.$DOMAIN
         username: $PROXMOX_API_USER
         password: $PROXMOX_API_PASS
-  - Pi-hole:
-      href: https://pihole.$DOMAIN/admin
+  - Pi-hole primary:
+      href: https://pihole1.$DOMAIN/admin
       icon: pi-hole
       widget:
         type: pihole
-        url: https://pihole.$DOMAIN
+        url: https://pihole1.$DOMAIN
         version: 6
-        key: $PIHOLE_API_KEY
+        key: $PIHOLE_PRIMARY_API_KEY
+  - Pi-hole secondary:
+      href: https://pihole2.$DOMAIN/admin
+      icon: pi-hole
+      widget:
+        type: pihole
+        url: https://pihole2.$DOMAIN
+        version: 6
+        key: $PIHOLE_SECONDARY_API_KEY
 
 - Networking:
   - Router:
       href: https://router.$DOMAIN
       icon: router
-  - Reverse Proxy:
-      href: https://reverseproxy.$DOMAIN
-      icon: nginx
   - WireGuard:
       href: https://wireguard.$DOMAIN
       icon: wireguard
@@ -38,12 +43,21 @@
         url: https://grafana.$DOMAIN
         username: $GRAFANA_USER
         password: $GRAFANA_PASS
-  - VictoriaMetrics:
-      href: https://victoriametrics.$DOMAIN
-      icon: prometheus
   - VictoriaLogs:
       href: https://victorialogs.$DOMAIN
-      icon: prometheus
+      icon: victorialogs
+  - VictoriaMetrics:
+      href: https://victoriametrics.$DOMAIN
+      icon: victoriametrics
+  - VMAlert:
+      href: https://vmalert.$DOMAIN
+      icon: victoriametrics
+  - VMAgent:
+      href: https://vmagent.$DOMAIN
+      icon: victoriametrics
+  - Alertmanager:
+      href: https://alertmanager.$DOMAIN
+      icon: alertmanager
 
 - Services:
   - Vaultwarden:
