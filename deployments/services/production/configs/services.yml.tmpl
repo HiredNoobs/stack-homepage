@@ -1,4 +1,7 @@
-- Homelab:
+- Infra:
+  - Router:
+      href: https://router.$DOMAIN
+      icon: router
   - Proxmox:
       href: https://proxmox.$DOMAIN
       icon: proxmox
@@ -7,6 +10,12 @@
         url: https://proxmox.$DOMAIN
         username: $PROXMOX_API_USER
         password: $PROXMOX_API_PASS
+  - NAS:
+      href: https://nas.$DOMAIN
+      icon: ugreen
+  - WireGuard:
+      href: https://wireguard.$DOMAIN
+      icon: wireguard
   - Pi-hole primary:
       href: https://pihole1.$DOMAIN/admin
       icon: pi-hole
@@ -23,14 +32,6 @@
         url: https://pihole2.$DOMAIN
         version: 6
         key: $PIHOLE_SECONDARY_API_KEY
-
-- Networking:
-  - Router:
-      href: https://router.$DOMAIN
-      icon: router
-  - WireGuard:
-      href: https://wireguard.$DOMAIN
-      icon: wireguard
 
 - Monitoring:
   - Grafana:
@@ -74,6 +75,12 @@
   - Jellyfin:
       href: https://jellyfin.$DOMAIN
       icon: jellyfin
-  - OpenMediaVault:
-      href: https://omv.$DOMAIN
-      icon: openmediavault
+  - Sonarr:
+      href: https://sonarr.$DOMAIN
+      icon: sonarr
+  - Radarr:
+      href: https://radarr.$DOMAIN
+      icon: radarr
+  - Bazarr:
+      href: https://bazarr.$DOMAIN
+      icon: bazarr
