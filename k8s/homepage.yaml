@@ -1,0 +1,123 @@
+# One replica per node labelled ${STACK}_homepage. Stateless, the config is rendered by 'deploy'
+# into the homepage-config Secret (it holds the widgets' credentials). Config changes restart
+# the pods one at a time.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+spec:
+  replicas: ${HOMEPAGE_REPLICAS}
+  # With one replica per node there's nowhere for an extra pod to go during an update,
+  # so replace them in place.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homepage
+      annotations:
+        checksum/config: "${HOMEPAGE_CONFIG_CHECKSUM}"
+    spec:
+      nodeSelector:
+        ${STACK}_homepage: ""
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: homepage
+              topologyKey: kubernetes.io/hostname
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: homepage
+      containers:
+        - name: homepage
+          image: ${HOMEPAGE_IMAGE}
+          env:
+            - name: PORT
+              value: "${HOMEPAGE_PORT}"
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: "homepage.${DOMAIN}"
+          ports:
+            - name: http
+              containerPort: ${HOMEPAGE_PORT}
+              protocol: TCP
+          # Requests for other hosts are refused, localhost is always allowed.
+          readinessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: "localhost:${HOMEPAGE_PORT}"
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: "localhost:${HOMEPAGE_PORT}"
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          # Mounted individually, homepage writes its logs to /app/config/logs.
+          volumeMounts:
+            - name: config
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
+              readOnly: true
+            - name: config
+              mountPath: /app/config/widgets.yaml
+              subPath: widgets.yaml
+              readOnly: true
+            - name: config
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+              readOnly: true
+            - name: config
+              mountPath: /app/config/bookmarks.yaml
+              subPath: bookmarks.yaml
+              readOnly: true
+            - name: config
+              mountPath: /app/config/custom.css
+              subPath: custom.css
+              readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: homepage-config
+---
+# nginx proxies homepage.$DOMAIN here.
+apiVersion: v1
+kind: Service
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+spec:
+  selector:
+    app.kubernetes.io/name: homepage
+  ports:
+    - name: http
+      port: ${HOMEPAGE_PORT}
+      targetPort: http
+      protocol: TCP

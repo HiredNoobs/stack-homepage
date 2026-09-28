@@ -1,3 +1,7 @@
+# href is opened in the browser, so it uses the $DOMAIN names (through nginx). A widget's url is
+# called from the homepage pod where $DOMAIN doesn't resolve, so it goes straight to the upstream,
+# the same ones as NGINX_SERVICES in stack-nginx. Self-signed certs are accepted.
+
 - Infra:
   - Router:
       href: https://router.$DOMAIN
@@ -7,31 +11,37 @@
       icon: proxmox
       widget:
         type: proxmox
-        url: https://proxmox.$DOMAIN
+        url: https://192.168.111.2:8006
         username: $PROXMOX_API_USER
         password: $PROXMOX_API_PASS
   - NAS:
       href: https://nas.$DOMAIN
       icon: ugreen
-  - WireGuard:
-      href: https://wireguard.$DOMAIN
-      icon: wireguard
-  - Pi-hole primary:
+  # One app password (PIHOLE_API_APP_PWHASH in stack-pihole) is shared by every replica.
+  - Pi-hole 1:
       href: https://pihole1.$DOMAIN/admin
       icon: pi-hole
       widget:
         type: pihole
-        url: https://pihole1.$DOMAIN
+        url: https://pihole-0.pihole.pihole-core.svc.cluster.local
         version: 6
-        key: $PIHOLE_PRIMARY_API_KEY
-  - Pi-hole secondary:
+        key: $PIHOLE_API_KEY
+  - Pi-hole 2:
       href: https://pihole2.$DOMAIN/admin
       icon: pi-hole
       widget:
         type: pihole
-        url: https://pihole2.$DOMAIN
+        url: https://pihole-1.pihole.pihole-core.svc.cluster.local
         version: 6
-        key: $PIHOLE_SECONDARY_API_KEY
+        key: $PIHOLE_API_KEY
+  - Pi-hole 3:
+      href: https://pihole3.$DOMAIN/admin
+      icon: pi-hole
+      widget:
+        type: pihole
+        url: https://pihole-2.pihole.pihole-core.svc.cluster.local
+        version: 6
+        key: $PIHOLE_API_KEY
 
 - Monitoring:
   - Grafana:
@@ -40,8 +50,8 @@
       widget:
         type: grafana
         version: 2
-        alerts: alertmanager 
-        url: https://grafana.$DOMAIN
+        alerts: alertmanager
+        url: https://grafana.grafana-core.svc.cluster.local:3000
         username: $GRAFANA_USER
         password: $GRAFANA_PASS
   - VictoriaLogs:
@@ -75,7 +85,7 @@
       icon: qbittorrent
       widget:
         type: qbittorrent
-        url: https://qbittorrent.$DOMAIN
+        url: http://192.168.111.6:8080
         username: $QBITTORRENT_USER
         password: $QBITTORRENT_PASS
         enableLeechProgress: true
@@ -93,28 +103,28 @@
       icon: sonarr
       widget:
         type: sonarr
-        url: https://sonarr.$DOMAIN
+        url: http://192.168.111.6:8989
         key: $SONARR_API_KEY
   - Radarr:
       href: https://radarr.$DOMAIN
       icon: radarr
       widget:
         type: radarr
-        url: https://radarr.$DOMAIN
+        url: http://192.168.111.6:7878
         key: $RADARR_API_KEY
   - Lidarr:
-      href: https://Lidarr.$DOMAIN
+      href: https://lidarr.$DOMAIN
       icon: lidarr
       widget:
         type: lidarr
-        url: https://lidarr.$DOMAIN
+        url: http://192.168.111.6:8686
         key: $LIDARR_API_KEY
   - Bazarr:
       href: https://bazarr.$DOMAIN
       icon: bazarr
       widget:
         type: bazarr
-        url: https://bazarr.$DOMAIN
+        url: http://192.168.111.6:6767
         key: $BAZARR_API_KEY
   - Profilarr:
       href: https://profilarr.$DOMAIN

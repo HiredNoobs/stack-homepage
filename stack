@@ -1,14 +1,54 @@
 #!/usr/bin/env bash
+#
+# Homepage. A Deployment with one replica per node labelled ${STACK}_homepage, reached through
+# nginx as homepage.$DOMAIN.
+
+# Variables substituted in k8s/*.yaml, anything else is left alone.
+K8S_TEMPLATE_VARS='$STACK $DOMAIN $HOMEPAGE_IMAGE $HOMEPAGE_PORT $HOMEPAGE_REPLICAS $HOMEPAGE_CONFIG_CHECKSUM'
 
 # -----------------------------------------------------
 # Helper functions
 # -----------------------------------------------------
 
+function check_stack_context {
+  if [[ -z "${DOMAIN:-}" ]]; then
+    log_error "DOMAIN isn't set, it's needed for HOMEPAGE_ALLOWED_HOSTS and the links."
+    exit 1
+  fi
+
+  if (( HOMEPAGE_REPLICAS == 0 )); then
+    log_error "No nodes are labelled ${STACK}_homepage."
+    exit 1
+  fi
+}
+
+function render {
+  envsubst "$K8S_TEMPLATE_VARS" < "$STACK_PATH/k8s/$1"
+}
+
+# Renders the *.tmpl configs into $1 with every variable, including the widgets' credentials
+# from secrets.env. Written to a temp dir so the rendered files never end up in the repo.
 function build_configs {
-  find "$CONFIGS" -maxdepth 1 -type f -name '*.tmpl' | while IFS= read -r tmpl; do
-    local out="${tmpl%.tmpl}"
-    envsubst < "$tmpl" > "$out"
+  local outdir="$1" tmpl
+
+  for tmpl in "$CONFIGS"/*.tmpl; do
+    [[ -e "$tmpl" ]] || continue
+    envsubst < "$tmpl" > "$outdir/$(basename "${tmpl%.tmpl}")"
   done
+}
+
+# Everything that needs a restart when it changes. A Secret, services.yaml and widgets.yaml
+# hold the widgets' credentials.
+function config {
+  local outdir="$1"
+
+  kubectl create secret generic homepage-config \
+    --from-file=settings.yaml="$CONFIGS/settings.yml" \
+    --from-file=bookmarks.yaml="$CONFIGS/bookmarks.yml" \
+    --from-file=custom.css="$CONFIGS/custom.css" \
+    --from-file=services.yaml="$outdir/services.yml" \
+    --from-file=widgets.yaml="$outdir/widgets.yml" \
+    --dry-run=client -o yaml
 }
 
 # -----------------------------------------------------
@@ -33,9 +73,29 @@ function stack_env {
   echo "HOMEPAGE NODES = ($HOMEPAGE_REPLICAS)"
   list "$HOMEPAGE_NODES"
   echo
+  echo "URL            = https://homepage.${DOMAIN:-}"
+  echo
 }
 
 function stack_deploy {
-  build_configs
-  docker stack deploy --detach=true -c homepage.yml "$STACK"
+  local outdir manifests_config
+
+  check_stack_context
+
+  outdir=$(mktemp -d)
+  build_configs "$outdir"
+
+  manifests_config=$(config "$outdir")
+  rm -rf "$outdir"
+
+  export HOMEPAGE_CONFIG_CHECKSUM=$(sha256sum <<< "$manifests_config" | cut -d' ' -f1)
+
+  log_info "Deploying $HOMEPAGE_REPLICAS Homepage replica(s) to $K8S_NAMESPACE."
+  {
+    echo "$manifests_config"
+    echo "---"
+    render homepage.yaml
+  } | kubectl apply --namespace "$K8S_NAMESPACE" -f -
+
+  kubectl rollout status deployment/homepage --namespace "$K8S_NAMESPACE" --timeout=5m
 }
